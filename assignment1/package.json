@@ -1,0 +1,11 @@
+{
+  "name": "assignment1",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "author": "Yannick Lang",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "tsx": "^4.19.1"
+  }
+}
