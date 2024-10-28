@@ -1,3 +1,4 @@
+import { probabilityMassOfS } from "./s.ts"
 const LARGE_VALUE = 1_000_000
 
 function probabilityMass(k: number): number {
@@ -50,4 +51,8 @@ function entropy2() {
   console.log("expected Value", expectedValue())
 
   console.log("entropy", entropy(), entropy2())
+
+  for (let i = 1; i < 10; i++) {
+    console.log(i, probabilityMassOfS(i))
+  }
 })()
