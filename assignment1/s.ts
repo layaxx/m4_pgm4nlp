@@ -47,7 +47,7 @@ export function probabilityMassOfS(s: number): number {
   )
 }
 
-const LARGE_VALUE = 1500
+const LARGE_VALUE = 4000
 
 export function expectationOfS() {
   // sum of x * p(x)
@@ -62,10 +62,8 @@ export function varianceOfS() {
   const expectation = expectationOfS()
 
   // i think that is infinite?
-  return (
-    Array.from(
-      { length: LARGE_VALUE },
-      (_, i) => Math.pow(i + 1 - expectation, 2) // start at 1
-    ).reduce((a, b) => a + b) / LARGE_VALUE
-  )
+  return Array.from(
+    { length: LARGE_VALUE },
+    (_, i) => probabilityMassOfS(i + 1) * Math.pow(i + 1 - expectation, 2) // start at 1
+  ).reduce((a, b) => a + b)
 }
