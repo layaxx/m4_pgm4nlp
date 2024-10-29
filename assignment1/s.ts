@@ -61,9 +61,8 @@ export function expectationOfS() {
 export function varianceOfS() {
   const expectation = expectationOfS()
 
-  // i think that is infinite?
   return Array.from(
     { length: LARGE_VALUE },
-    (_, i) => probabilityMassOfS(i + 1) * Math.pow(i + 1 - expectation, 2) // start at 1
+    (_, i) => probabilityMassOfS(i) * Math.pow(i - expectation, 2)
   ).reduce((a, b) => a + b)
 }
