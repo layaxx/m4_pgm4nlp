@@ -40,26 +40,32 @@ function getAllPossibilities(num: number): Record<number, number> {
 }
 
 export function probabilityMassOfS(s: number): number {
-  return Object.entries(getAllPossibilities(s))
-    .map(([keyString, amount]) => amount * Math.pow(1 / 6, Number(keyString)))
-    .reduce((a, b) => a + b, 0)
+  return (
+    Object.entries(getAllPossibilities(s))
+      .map(([keyString, amount]) => amount * Math.pow(1 / 6, Number(keyString)))
+      .reduce((a, b) => a + b, 0) || 0
+  )
 }
+
+const LARGE_VALUE = 1500
 
 export function expectationOfS() {
   // sum of x * p(x)
 
   return Array.from(
-    { length: 1000 },
+    { length: LARGE_VALUE },
     (_, i) => i * probabilityMassOfS(i)
   ).reduce((a, b) => a + b)
 }
 
 export function varianceOfS() {
   const expectation = expectationOfS()
+
+  // i think that is infinite?
   return (
     Array.from(
-      { length: 1000 },
+      { length: LARGE_VALUE },
       (_, i) => Math.pow(i + 1 - expectation, 2) // start at 1
-    ).reduce((a, b) => a + b) / 1000
+    ).reduce((a, b) => a + b) / LARGE_VALUE
   )
 }

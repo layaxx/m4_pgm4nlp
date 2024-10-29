@@ -1,4 +1,5 @@
 import { expectationOfS, probabilityMassOfS, varianceOfS } from "./s.ts"
+
 const LARGE_VALUE = 1_000_000
 
 function probabilityMass(k: number): number {
