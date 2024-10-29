@@ -43,6 +43,32 @@ function entropy2() {
   return -1 * sum
 }
 
+function newProbabilityMass(k: number): number {
+  if (k < 1) return 0
+  // prob of k => hitting k-1 times anything but 1, then hitting 1
+  // 1 => 2/6
+  // 2 => 4/6 * 2/6
+  // 3 => 4/6 * 4/6 * 2/6
+
+  // => (4/6)^(k-1) * 2/6
+
+  // obv. could be simplified to 2/3 and 1/3
+
+  return Math.pow(4 / 6, k - 1) * (2 / 6)
+}
+
+function kullbackLeiblerDivergence() {
+  // Dkl(p||q) sum of p(x) * log (p(x)/q(x))
+  // Dkl(k'||k) => sum of newProbabilityMass(x) * log(newProbabilityMass(x)/probabilityMass(x))
+  return Array.from({ length: 1800 }, (_, i) => {
+    // larger values give NaN
+    const x = i + 1 // start with 1
+    const newProb = newProbabilityMass(x)
+    const oldProb = probabilityMass(x)
+    return newProb * Math.log(newProb / oldProb)
+  }).reduce((a, b) => a + b)
+}
+
 ;(function main() {
   for (let i = 1; i < 10; i++) {
     console.log(i, probabilityMass(i))
@@ -58,4 +84,6 @@ function entropy2() {
 
   console.log("expectation of S", expectationOfS())
   console.log("variance of S", varianceOfS())
+
+  console.log("Kullback-Leibler Divergence", kullbackLeiblerDivergence())
 })()
