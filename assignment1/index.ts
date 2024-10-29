@@ -58,6 +58,15 @@ function newProbabilityMass(k: number): number {
   return Math.pow(4 / 6, k - 1) * (2 / 6)
 }
 
+function newExpectedValue(): number {
+  // weighted sum of values (weighted by probability)
+  let sum = 0
+  for (let i = 0; i < LARGE_VALUE; i++) {
+    sum += i * newProbabilityMass(i)
+  }
+  return sum
+}
+
 function kullbackLeiblerDivergence() {
   // Dkl(p||q) sum of p(x) * log (p(x)/q(x))
   // Dkl(k'||k) => sum of newProbabilityMass(x) * log(newProbabilityMass(x)/probabilityMass(x))
@@ -87,4 +96,6 @@ function kullbackLeiblerDivergence() {
   console.log("variance of S", varianceOfS())
 
   console.log("Kullback-Leibler Divergence", kullbackLeiblerDivergence())
+
+  console.log("new expected value", newExpectedValue())
 })()
