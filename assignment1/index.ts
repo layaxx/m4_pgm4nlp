@@ -1,4 +1,4 @@
-import { probabilityMassOfS } from "./s.ts"
+import { expectationOfS, probabilityMassOfS, varianceOfS } from "./s.ts"
 const LARGE_VALUE = 1_000_000
 
 function probabilityMass(k: number): number {
@@ -44,7 +44,7 @@ function entropy2() {
 }
 
 ;(function main() {
-  for (let i = 1; i < 100; i++) {
+  for (let i = 1; i < 10; i++) {
     console.log(i, probabilityMass(i))
   }
 
@@ -55,4 +55,7 @@ function entropy2() {
   for (let i = 1; i < 10; i++) {
     console.log(i, probabilityMassOfS(i))
   }
+
+  console.log("expectation of S", expectationOfS())
+  console.log("variance of S", varianceOfS())
 })()

@@ -44,3 +44,22 @@ export function probabilityMassOfS(s: number): number {
     .map(([keyString, amount]) => amount * Math.pow(1 / 6, Number(keyString)))
     .reduce((a, b) => a + b, 0)
 }
+
+export function expectationOfS() {
+  // sum of x * p(x)
+
+  return Array.from(
+    { length: 1000 },
+    (_, i) => i * probabilityMassOfS(i)
+  ).reduce((a, b) => a + b)
+}
+
+export function varianceOfS() {
+  const expectation = expectationOfS()
+  return (
+    Array.from(
+      { length: 1000 },
+      (_, i) => Math.pow(i + 1 - expectation, 2) // start at 1
+    ).reduce((a, b) => a + b) / 1000
+  )
+}
