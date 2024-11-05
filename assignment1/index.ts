@@ -80,22 +80,27 @@ function kullbackLeiblerDivergence() {
 }
 
 ;(function main() {
+  console.log("Probability mass of k, first 10 values")
   for (let i = 1; i < 10; i++) {
     console.log(i, probabilityMass(i))
   }
 
-  console.log("expected Value", expectedValue())
+  console.log("Expectation normal die", expectedValue())
 
-  console.log("entropy", entropy(), entropy2())
+  console.log("Entropy normal die (func, loop)", entropy(), entropy2())
 
+  console.log("Probability mass of s, first 10 values")
   for (let i = 1; i < 10; i++) {
     console.log(i, probabilityMassOfS(i))
   }
 
-  console.log("expectation of S", expectationOfS())
-  console.log("variance of S", varianceOfS())
+  console.log("Expectation of s (sum of rolls)", expectationOfS())
+  console.log("Variance of s (sum of rolls", varianceOfS())
 
-  console.log("Kullback-Leibler Divergence", kullbackLeiblerDivergence())
+  console.log(
+    "Kullback-Leibler Divergence (trick die, die)",
+    kullbackLeiblerDivergence()
+  )
 
-  console.log("new expected value", newExpectedValue())
+  console.log("Expectation trick die", newExpectedValue())
 })()
