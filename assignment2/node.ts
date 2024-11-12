@@ -7,12 +7,17 @@ export class NetworkNode {
   range: Set<string>
   probabilityTable: ProbabilityTable
 
-  constructor(newName: string, range: Set<string>, parents: Set<NetworkNode>) {
+  constructor(
+    newName: string,
+    range: Set<string>,
+    parents: Set<NetworkNode>,
+    cpt: ProbabilityTable
+  ) {
     this.name = newName
     this.range = range
     this.parents = parents
     this.children = new Set()
     parents.forEach((p) => p.children.add(this))
-    this.probabilityTable = new ProbabilityTable(range.size)
+    this.probabilityTable = cpt
   }
 }
