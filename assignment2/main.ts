@@ -103,15 +103,17 @@ async function getObservations(
   })
 
   const observations: Array<{ [key: string]: string }> = []
-  let currentObservation = {}
 
-  let counter = 1
+  let currentObservation = { tok1: "BOS", pos1: "BOS" }
+  let counter = 2
 
   for await (const line of rl) {
     if (line.trim().length === 0) {
+      currentObservation["pos" + counter] = "EOS"
+      currentObservation["tok" + counter] = "EOS"
       observations.push(currentObservation)
-      currentObservation = {}
-      counter = 1
+      currentObservation = { tok1: "BOS", pos1: "BOS" }
+      counter = 2
     } else {
       const [token, tag] = line.split(" ")
 
