@@ -14,6 +14,8 @@ export class ProbabilityTable {
     const parents = this.data.get(this.#concatValues(parentValues))
 
     if (!parents) {
+      console.log("fallback value")
+
       // FIXME: why do we do this instead of returning #value observed / #total observations?
       return 1 / this.ylength
     }
@@ -39,5 +41,31 @@ export class ProbabilityTable {
     const count = parents.get(value)
 
     parents.set(value, (count ?? 0) + 1)
+  }
+
+  sample(range: Set<string>, parentValues: string[]): string {
+    console.log("sampling, given", this.#concatValues(parentValues))
+
+    const relevantData = this.data.get(this.#concatValues(parentValues))
+
+    if (!relevantData) {
+      // return random value from range (uniform distribution)
+      return Array.from(range)[Math.floor(Math.random() * range.size)]
+    }
+
+    const relevantEntries = Array.from(relevantData.entries())
+
+    const total = relevantEntries.reduce((sum, [_key, value]) => sum + value, 0)
+
+    const random = Math.random() * total
+    return relevantEntries.reduce(
+      ([acc, sum], [value, count]) => {
+        if (sum < random) {
+          return [value, sum + count]
+        }
+        return [acc, sum]
+      },
+      ["", 0]
+    )[0]
   }
 }

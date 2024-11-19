@@ -134,6 +134,11 @@ async function getObservations(
 async function main() {
   const { longestLine, rareTokens, tags, tokens } = await analyzeTrainingSet()
 
+  tags.add("BOS")
+  tags.add("EOS")
+  tokens.add("BOS")
+  tokens.add("EOS")
+
   const network = init(longestLine + 2, tokens, tags)
 
   const observations = await getObservations(rareTokens)
