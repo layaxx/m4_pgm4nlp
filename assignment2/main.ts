@@ -144,6 +144,31 @@ async function main() {
   const observations = await getObservations(rareTokens)
 
   network.train(observations)
+
+  console.log(
+    "probability of EOS following a .:",
+    network.probabilityOf({ pos17: "EOS" }, { pos16: "." })
+  )
+
+  console.log(
+    "MAP(tok2) given pos2=. =>",
+    network.MAP(new Set(["tok2"]), { pos2: "." })
+  )
+
+  console.log(
+    "MAP(tok16,pos16) given pos15=. =>",
+    network.MAP(new Set(["tok16", "pos16"]), { pos15: "." })
+  )
+
+  console.log(
+    "MAP(tok1,pos1) given nothing =>",
+    network.MAP(new Set(["tok1", "pos1"]), {})
+  )
+
+  console.log(
+    "MAP(tok20,pos20) given nothing =>",
+    network.MAP(new Set(["tok20", "pos20"]), {})
+  )
 }
 
 main()

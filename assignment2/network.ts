@@ -25,7 +25,22 @@ export class Network {
   probabilityOf(obs: Observation, given: Observation): number {
     const names = Object.keys(obs)
     if (names.length > 1) {
-      throw new Error("Not yet implemented: Only one observation at a time")
+      if (names.length === 2) {
+        return (
+          this.probabilityOf(
+            { [names[0]]: obs[names[0]] },
+            { [names[1]]: obs[names[1]], ...given }
+          ) *
+          this.probabilityOf(
+            { [names[1]]: obs[names[1]] },
+            { [names[0]]: obs[names[0]], ...given }
+          )
+        )
+      }
+
+      throw new Error(
+        "Not yet implemented: No more than two observation at a time"
+      )
     }
 
     const [name] = names,
@@ -185,7 +200,7 @@ export class Network {
     }
 
     if (currentBest) {
-      console.log("found MAP with probability score of", currentBestProb)
+      // console.log("found MAP with probability score of", currentBestProb)
       return currentBest
     }
     throw new Error("Illegal State: no best constellation found")
