@@ -37,3 +37,17 @@ Examples (also included in the code, just run `yarn tsx main.ts`):
 `network.MAP(new Set(["tok20", "pos20"]), {})` => `{ tok1: 'BOS', pos1: 'BOS' }`
 
 => I am unsure if this is to be expected. I think it makes sense that the BOS tag+token pair is the most likely if we disregard parents, but I am not sure if parents should have been considered here.
+
+## Expected Output of running `yarn tsx main.ts`
+
+```text
+44 tags and 17258 tokens
+rare tokens 10933
+longest line 78
+probability of EOS following a .: 0.9368981533929988
+MAP(tok2) given pos2=. => { tok2: '.' }
+MAP(tok16,pos16) given pos15=. => { tok16: 'EOS', pos16: 'EOS' }
+MAP(tok1,pos1) given nothing => { tok1: 'BOS', pos1: 'BOS' }
+MAP(tok20,pos20) given nothing => { tok20: 'BOS', pos20: 'BOS' }
+Done in 5.32s.
+```
