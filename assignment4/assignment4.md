@@ -1,4 +1,4 @@
-# Solutions to Assignment 4 (NLProc-PGM4NLP-M)
+# Assignment 4 (NLProc-PGM4NLP-M)
 
 by Yannick Lang
 
@@ -18,7 +18,7 @@ We then have `r` possible paths, from which we can pick the best one.
 
 We use a modified Viterbi algorithm, instead of saving only the best (lowest distance or highest factor) path (as back-pointer + value) for each node, we save the top k paths. Each root node starts with one empty path with cost 0 and k-1 empty paths with infinite cost. After going traversing the graph with the Viterbi algorithm, the final node has the top-k paths, which can be reconstructed from the back-pointers.
 
-Because each starting node has only one non-infinite-cost path, these paths are guaranteed to be unique and the Viterbi algorithm ensures that thez are optimal paths.
+Because each starting node has only one non-infinite-cost path, these paths are guaranteed to be unique and the Viterbi algorithm ensures that they are optimal paths.
 
 ## Part 4: sampling from a linear chain Markov field
 
@@ -27,3 +27,11 @@ Apply the forward algorithm to sample the last node. This node has now been samp
 Repeat until every node has been sampled.
 
 ## Part 5: marginal probabilities
+
+Marginal Probabilities in a linear Markov field can be calculated via the forward-backward algorithm.
+
+In the forward pass, we start with a vector of initial values and iteratively apply all transition matrices. Those give the probability of ending up in any given state, given all previous states. This represents the information we gain from nodes on the left side.
+
+In the backward pass, the probability of observing the remaining observations from a given starting point are calculated. This represents information we gain from nodes on the right side.
+
+Probabilities from the forward and backward passes can then be multiplied to obtain the marginal probabilities for any given node.
