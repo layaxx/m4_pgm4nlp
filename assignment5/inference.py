@@ -14,17 +14,48 @@ def gibbs(fg, evidence, n_steps, temp=1):
     Return a full observation -- keys are variable names, values are variable values
     """
 
+    unobserved_vars = []
+
     # initialize unobserved variables uniformly randomly
     pred = {}
     pred.update(evidence)
     for vname, var in fg.variables.items():
         if vname not in pred:
             pred[vname] = random.choice(list(var._range))
+            unobserved_vars.append(vname)
 
     """
     Fill in the rest here!!!
     """
-    raise NotImplementedError
+
+    # repeat n times
+    for _ in range(n_steps):
+        # choose random variable
+        var_to_be_updated = random.choice(unobserved_vars)
+
+        node = fg.variables[var_to_be_updated]
+
+        # update this variable
+        agreements = []
+        sum_of_agreements = 1
+
+        values = list(node._range)
+        for possible_value in values:
+            agreement = 1
+            for factor in node.factors:
+                vals = [
+                    (
+                        possible_value
+                        if var.name == var_to_be_updated
+                        else pred[var.name]
+                    )
+                    for var in factor.variables
+                ]
+                agreement *= factor.f(vals)
+            agreements.append(agreement)
+            sum_of_agreements += agreement
+
+        pred[var_to_be_updated] = random.choices(values, weights=agreements, k=1)[0]
 
     return pred
 
@@ -158,9 +189,9 @@ def eval(predictions, golds):
 if __name__ == "__main__":
     train_sents = load("train.txt")
     bn = train(train_sents, max_len=20)
-    fg = from_bayesnet(bn)
+    factor_graph = from_bayesnet(bn)
 
-    vocab = fg.variables["tok0"]._range
+    vocab = factor_graph.variables["tok0"]._range
 
     test_sents = load("test.txt")
     test_obs = [
@@ -169,12 +200,12 @@ if __name__ == "__main__":
     gold_obs = [make_obs(s, vocab, max_len=20, include_labels=True) for s in test_sents]
     bp_pred_obs = []
     gibbs_pred_obs = []
-    for obs in test_obs:
+    for index, observation in enumerate(test_obs):
 
         try:
             # without working in log space, we get division by zero
             # if we make the temperature much lower
-            marginals = belief_prop(fg, obs, temp=0.5)
+            marginals = belief_prop(factor_graph, observation, temp=0.5)
             bp_pred = {}
             for var in marginals:
                 bp_pred[var] = max(marginals[var], key=marginals[var].get)
@@ -184,11 +215,7 @@ if __name__ == "__main__":
         except NotImplementedError:
             pass
 
-        try:
-            gibbs_pred = gibbs(fg, obs, 2000, temp=1)
-            gibbs_pred_obs.append(gibbs_pred)
+        gibbs_pred = gibbs(factor_graph, observation, 2000, temp=1)
+        gibbs_pred_obs.append(gibbs_pred)
 
-            print("Gibbs Accuracy so far:", eval(gibbs_pred_obs, gold_obs))
-
-        except NotImplementedError:
-            pass
+        print("Gibbs Accuracy so far:", eval(gibbs_pred_obs, gold_obs))
