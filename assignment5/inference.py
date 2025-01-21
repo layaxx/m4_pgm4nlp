@@ -50,9 +50,7 @@ def gibbs(fg, evidence, n_steps, temp=1):
                     )
                     for var in factor.variables
                 ]
-                agreement *= (
-                    factor.f(vals) ** temp
-                )  # TODO: is this the correct place to add temp?
+                agreement *= factor.f(vals) ** temp
             agreements.append(agreement)
 
         pred[var_to_be_updated] = random.choices(values, weights=agreements, k=1)[0]
