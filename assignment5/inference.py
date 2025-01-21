@@ -37,7 +37,6 @@ def gibbs(fg, evidence, n_steps, temp=1):
 
         # update this variable
         agreements = []
-        sum_of_agreements = 1
 
         values = list(node._range)
         for possible_value in values:
@@ -51,9 +50,10 @@ def gibbs(fg, evidence, n_steps, temp=1):
                     )
                     for var in factor.variables
                 ]
-                agreement *= factor.f(vals)
+                agreement *= (
+                    factor.f(vals) ** temp
+                )  # TODO: is this the correct place to add temp?
             agreements.append(agreement)
-            sum_of_agreements += agreement
 
         pred[var_to_be_updated] = random.choices(values, weights=agreements, k=1)[0]
 
