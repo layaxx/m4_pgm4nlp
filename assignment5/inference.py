@@ -61,31 +61,75 @@ def gibbs(fg, evidence, n_steps, temp=1):
 
 
 def calculate_v2f_message(variable, relevant_messages):
+    """
+    Calculate the message from a variable node to a factor node in a factor graph.
+
+    This function computes the message that a variable node sends to a factor node by
+    taking the product of all incoming messages for each value in the variable's range.
+
+    Args:
+        variable (Variable): The variable node from which the message is sent
+        relevant_messages (list of dicts): A list of dictionaries, where each
+                dictionary represents a message from a neighboring factor to this
+                variable node. Each dictionary maps values in the variable's range
+                to their corresponding message values.
+
+    Returns:
+        new_message: A dictionary representing the message from the variable node to
+            the factor node according to the given messages. The keys are the values
+            in the variable's range, and the values are the product of all incoming
+            messages for each corresponding value.
+    """
     new_message = {}
 
     for value in variable._range:
+        # initialize to 1
         new_message[value] = 1
+
+        # get the product of all incoming messages for this value
         for message in relevant_messages:
             new_message[value] *= message[value]
+
     return new_message
 
 
-def calculate_f2v_message(factor, relevant_v2f_messages, target_var, temp):
+def calculate_f2v_message(factor, relevant_v2f_messages, target_variable, temp):
+    """
+    Calculate the message from a factor to a variable in a factor graph.
+
+    Args:
+        factor (Factor): The factor from which the message is being sent.
+        relevant_v2f_messages (list of tuples): A list of tuples where each tuple
+            contains a variable and the message from that variable to the factor.
+        target_variable (Variable): The variable to which the message is being sent.
+        temp (float): A temperature parameter used to scale the factor function.
+
+    Returns:
+        dict: A dictionary representing the message from the factor to the
+        target variable. The keys are the possible values of the target variable,
+        and the values are the corresponding message values.
+    """
     message = {}
 
+    # get all possible assignments to surrounding nodes
     possible_combinations = itertools.product(*[var._range for var in factor.variables])
 
-    for value in target_var._range:
+    # initialize to 0 for all possible values
+    for value in target_variable._range:
         message[value] = 0
 
     for combination in possible_combinations:
-        val = combination[factor.variables.index(target_var)]
-        facs = factor.f(combination) ** temp
+        target_node_value = combination[factor.variables.index(target_variable)]
+
+        # get the agreement of this assignment
+        product = factor.f(combination) ** temp
 
         for variable, relevant_message in relevant_v2f_messages:
-            facs *= relevant_message[combination[factor.variables.index(variable)]]
+            # combine with the corresponding parts of received messages
+            product *= relevant_message[combination[factor.variables.index(variable)]]
 
-        message[val] = message.get(val, 0) + facs
+        # sum up
+        message[target_node_value] += product
 
     return message
 
@@ -101,17 +145,15 @@ def find_calculable_message(
     calculable if all the required incoming messages are present.
 
     Args:
-        fg: The factor graph containing factors and variables.
+        fg: The factor graph
         unsent_f2v_messages (list): List of unsent factor-to-variable messages.
         unsent_v2f_messages (list): List of unsent variable-to-factor messages.
         f2v_messages (set): Set of sent factor-to-variable messages.
         v2f_messages (set): Set of sent variable-to-factor messages.
 
     Returns:
-        tuple: A tuple containing the calculable message and a boolean flag
-               indicating the type of message. The boolean flag is True if
-               the message is a factor-to-variable message, and False if it
-               is a variable-to-factor message.
+        tuple: A tuple containing the calculable message and a boolean flag indicating
+        the type of message. True iff message is factor-to-variable message, False else.
     """
 
     for message in unsent_f2v_messages:
