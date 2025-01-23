@@ -1,3 +1,4 @@
+import itertools
 import sys
 from bayes import load, train, make_obs
 from factor_graph import from_bayesnet
@@ -59,18 +60,32 @@ def gibbs(fg, evidence, n_steps, temp=1):
     return pred
 
 
-def calculate_v2f_message(variable, f2v_messages, v2f_messages):
-    val = random.choice(list(variable._range))
-    message = {val: 1}
-    for valprime in variable._range:
-        if valprime != val:
-            message[valprime] = 0
+def calculate_v2f_message(variable, relevant_messages):
+    new_message = {}
 
-    return message
+    for value in variable._range:
+        new_message[value] = 1
+        for message in relevant_messages:
+            new_message[value] *= message[value]
+    return new_message
 
 
-def calculate_f2v_message(factor, v2f_messages, f2v_messages):
-    message = {"val": 1}
+def calculate_f2v_message(factor, relevant_v2f_messages, target_var, temp):
+    message = {}
+
+    possible_combinations = itertools.product(*[var._range for var in factor.variables])
+
+    for value in target_var._range:
+        message[value] = 0
+
+    for combination in possible_combinations:
+        val = combination[factor.variables.index(target_var)]
+        facs = factor.f(combination) ** temp
+
+        for variable, relevant_message in relevant_v2f_messages:
+            facs *= relevant_message[combination[factor.variables.index(variable)]]
+
+        message[val] = message.get(val, 0) + facs
 
     return message
 
@@ -214,12 +229,8 @@ def belief_prop(fg, evidence, temp=1):
 
     # YOUR CODE HERE!
 
-    # use itertools.product
-
     unsent_v2f_messages = set(v2f_message_names) - set(v2f_messages.keys())
     unsent_f2v_messages = set(f2v_message_names) - set(f2v_messages.keys())
-
-    # raise NotImplementedError
 
     # while there are unsent messages left
     while len(unsent_f2v_messages) + len(unsent_v2f_messages) > 0:
@@ -234,18 +245,24 @@ def belief_prop(fg, evidence, temp=1):
 
         message_to_calculate, is_factor_message = response
 
-        print(message_to_calculate, is_factor_message)
-
-        first, second = message_to_calculate
-
         if is_factor_message:
-            f2v_messages[first, second] = calculate_f2v_message(
-                fg.factors[first], v2f_messages, f2v_messages
+            fname, vname = message_to_calculate
+            f2v_messages[fname, vname] = calculate_f2v_message(
+                fg.factors[fname],
+                [
+                    (fg.variables[key[0]], value)
+                    for key, value in v2f_messages.items()
+                    if key[1] == fname
+                ],
+                fg.variables[vname],
+                temp,
             )
             unsent_f2v_messages.remove(message_to_calculate)
         else:
-            v2f_messages[first, second] = calculate_v2f_message(
-                fg.variables[first], f2v_messages, v2f_messages
+            vname, fname = message_to_calculate
+            v2f_messages[vname, fname] = calculate_v2f_message(
+                fg.variables[vname],
+                [value for key, value in f2v_messages.items() if key[1] == vname],
             )
             unsent_v2f_messages.remove(message_to_calculate)
 
